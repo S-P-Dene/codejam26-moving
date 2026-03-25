@@ -19,64 +19,72 @@
       height: 480px;
     }
 
-    /* Your style here... (feel free to remove this example styling) */
     #skip {
-      display: none; /* Hidden until ad starts */
       position: absolute;
-      bottom: 60px;
-      right: 0;
+      bottom: 20px;
+      right: 20px;
       padding: 10px 18px;
       background: rgba(0, 0, 0, 0.6);
-      border: 1px solid black;
-      border-right-width: 0;
+      border: 1px solid white;
       font-size: 1.2rem;
-      border-radius: 4px 0 0 4px;
       color: white;
       cursor: pointer;
+	  animation: pulse 1s infinite ease-in-out;
+    }
+	
+	@keyframes pulse {
+        0%,100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.2);
+        }
     }
   </style>
 </head>
 
 <body>
   <div id="overlay-container">
-    <!-- We've added a sample button. Feel free to remove it: -->
     <button id="skip">
-      Skip Ad...
+      Skip Ad&nbsp;&nbsp;&#x25B6;&#x23B8;
     </button>
   </div>
 
   <script type="text/javascript">
     (function(window, document){
-      // This is how you tell the parent window that the ad was successfully skipped.
+
       function adSuccess() {
         window.top.postMessage({ type: 'success' }, '*');
-      }
+      } 
 
-      const skipButton = document.getElementById('skip');
-
-      // Listen for messages from the game shell
       window.addEventListener('message', (event) => {
-        if (!event.data || !event.data.type) return;
-
-        if (event.data.type === 'adStarted') {
-          // Show the skip button when the ad starts
-          skipButton.style.display = 'block';
-        }
-
-        // By default, if the user doesn't "skip" the ad before the video ends,
-        // we call fail to restart. You're welcome to replace this with a survey
-        // or other interaction instead (see examples/survey).
-        if (event.data.type === 'adFinished') {
-          skipButton.style.display = 'none';
+        if (event.data && event.data.type === 'adFinished') {
           window.top.postMessage({ type: 'fail' }, '*');
         }
       });
 
-      // Your ad overlay code goes here, we've added a simple example below:
-      skipButton.addEventListener('click', () => {
-        skipButton.style.display = 'none';
-        adSuccess();
-      });
+      skip.addEventListener('click', () => adSuccess());
+		   
+      document.addEventListener('mousemove', (event) => {
+	    let mouseX = event.clientX;
+		let mouseY = event.clientY;
+  
+		const skip_bb = skip.getBoundingClientRect();
+		
+		// mouse near Skip button
+		if (mouseX > skip_bb.left - 40 && mouseX < skip_bb.right + 40) {
+		  if (mouseY > skip_bb.top - 40 && mouseY < skip_bb.bottom + 40) {
+			if (skip.style.bottom == "20px") {
+			  skip.style.bottom = "auto";
+			  skip.style.top = "20px";
+			}
+			else {
+			  skip.style.bottom = "20px";
+			  skip.style.top = "auto";
+			}				  
+		  }
+	    }
+	  });
 
     })(window, document);
   </script>
